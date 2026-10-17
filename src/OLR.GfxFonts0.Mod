@@ -21,7 +21,7 @@ MODULE GfxFonts0; (** non-portable *)	(* eos  *)
 	*)
 	
 	IMPORT
-		FileDir, Strings;
+		FileDir, Strings, Root;
 		
 	
 	VAR
@@ -30,11 +30,14 @@ MODULE GfxFonts0; (** non-portable *)	(* eos  *)
 		
 	
 
-	PROCEDURE EnumFile (name: ARRAY OF CHAR; time, date, size: LONGINT; VAR flags: SET);
+	PROCEDURE EnumFile (path: ARRAY OF CHAR; time, date, size: LONGINT; VAR flags: SET);
 		CONST isdir = FALSE;
-		VAR i, ppm: INTEGER; s: ARRAY 4 OF CHAR;
+		VAR i, j, ppm: INTEGER; s: ARRAY 4 OF CHAR; name: ARRAY 64 OF CHAR;
 
 	BEGIN
+		(* polpo: the name without its directory; Fonts.This finds the file on the search path *)
+		i := 0; j := 0; WHILE path[i] # 0X DO IF path[i] = "/" THEN j := i+1 END; INC(i) END;
+		i := 0; WHILE (path[j] # 0X) & (i < LEN(name)-1) DO name[i] := path[j]; INC(i); INC(j) END; name[i] := 0X;
 		IF ~isdir THEN
 			i := 0; ppm := 0;
 			WHILE (name[i] # 0X) & (name[i] # ".") & (name[i] < "0") OR ("9" < name[i]) DO INC(i) END;
@@ -63,7 +66,7 @@ MODULE GfxFonts0; (** non-portable *)	(* eos  *)
 	
 	(** find raster font file that most closely matches the requested number of pixels per em **)
 	PROCEDURE Find* (VAR family, style: ARRAY OF CHAR; ppm: INTEGER; VAR name: ARRAY OF CHAR; VAR fppm: INTEGER);
-		VAR pattern: ARRAY 64 OF CHAR;
+		VAR pattern, rel: ARRAY 64 OF CHAR; full: ARRAY 256 OF CHAR;
 	BEGIN
 		Name := ""; FPPM := 0;
 		COPY(style, Style); PPM := ppm; Error := MAX(INTEGER);
@@ -76,6 +79,10 @@ MODULE GfxFonts0; (** non-portable *)	(* eos  *)
 		Strings.Append(pattern, ".*.Fnt");
 
 		FileDir.Enumerate(pattern, {}, EnumFile);
+		IF Error # 0 THEN  (* polpo: the fonts are in fonts/ of the root *)
+			COPY("fonts/", rel); Strings.Append(rel, pattern); Root.Join(rel, full);
+			FileDir.Enumerate(full, {}, EnumFile)
+		END;
 
 		COPY(Name, name); fppm := FPPM
 	END Find;
