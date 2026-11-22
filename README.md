@@ -18,6 +18,7 @@ portia.Install gfx
     src/Gfx.Mod, GfxRaster.Mod               the drawing interface and the rasterizer
     src/GfxDisplay.Mod, GfxBuffer.Mod, GfxPrinter.Mod   screen, images, printers
     share/GfxOverview.html, GfxHowto.html    the documentation
+    share/Oberon.MTF, OberonBold.MTF, OberonItalic.MTF   the outlines of the fonts Oberon
     tools/Gfx.Tool
     test/GfxDrawTest.Mod
 
@@ -25,10 +26,15 @@ The sources come from ETH Linux Oberon (OLR, 2017-06-18), converted from Oberon 
 text; the first commit has them unchanged, the second makes GfxFonts0 find the raster fonts in
 fonts/ of polpo. They compile unchanged with all five of polpo's compilers.
 
+The outlines (metafonts) Oberon.MTF, OberonBold.MTF and OberonItalic.MTF come unchanged from
+Contrib/Metafonts/Oberon.Arc of the ETH Oberon archive. GfxFonts draws Oberon, Oberon-Bold and
+Oberon-Italic from them at the sizes that have no raster font.
+
 ## Tests
 
-    GfxDrawTest.Run      2 checks: a red rectangle drawn into an image, its pixels checked inside
-                         and outside; it needs the desktop's display
+    GfxDrawTest.Run      3 checks: a red rectangle drawn into an image, its pixels checked inside
+                         and outside; the outline of A from Oberon.MTF, with curves; it needs
+                         the desktop's display
 
 The license is GPL-3 (`LICENSE`); the code comes from ETH Oberon, whose license (`LICENSE.ETH`)
 asks to keep its copyright notice and conditions, which `LICENSE.ETH` does.
